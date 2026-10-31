@@ -1,0 +1,207 @@
+{
+ "meta": {
+  "n_samples": 300,
+  "kb_chunks": 53,
+  "recall_k": 5,
+  "retrieve_k": 10,
+  "concurrency": 10,
+  "chat_model": "qwen3.8-flash",
+  "generated_at": "2026-10-07 17:27"
+ },
+ "retrieval": {
+  "vector": {
+   "A_policy": {
+    "recall": 1.0,
+    "mrr": 0.919
+   },
+   "B_model": {
+    "recall": 1.0,
+    "mrr": 0.911
+   },
+   "C_colloquial": {
+    "recall": 1.0,
+    "mrr": 0.883
+   },
+   "E_multi": {
+    "recall": 0.892,
+    "mrr": 0.628
+   },
+   "overall": {
+    "recall": 0.973,
+    "mrr": 0.835
+   }
+  },
+  "bm25": {
+   "A_policy": {
+    "recall": 1.0,
+    "mrr": 0.921
+   },
+   "B_model": {
+    "recall": 1.0,
+    "mrr": 0.992
+   },
+   "C_colloquial": {
+    "recall": 0.833,
+    "mrr": 0.635
+   },
+   "E_multi": {
+    "recall": 0.819,
+    "mrr": 0.58
+   },
+   "overall": {
+    "recall": 0.913,
+    "mrr": 0.782
+   }
+  },
+  "hybrid": {
+   "A_policy": {
+    "recall": 1.0,
+    "mrr": 0.922
+   },
+   "B_model": {
+    "recall": 1.0,
+    "mrr": 0.972
+   },
+   "C_colloquial": {
+    "recall": 0.933,
+    "mrr": 0.772
+   },
+   "E_multi": {
+    "recall": 0.858,
+    "mrr": 0.626
+   },
+   "overall": {
+    "recall": 0.948,
+    "mrr": 0.823
+   }
+  },
+  "hybrid_rerank": {
+   "A_policy": {
+    "recall": 1.0,
+    "mrr": 0.956
+   },
+   "B_model": {
+    "recall": 1.0,
+    "mrr": 1.0
+   },
+   "C_colloquial": {
+    "recall": 1.0,
+    "mrr": 0.958
+   },
+   "E_multi": {
+    "recall": 0.936,
+    "mrr": 0.658
+   },
+   "overall": {
+    "recall": 0.984,
+    "mrr": 0.893
+   }
+  }
+ },
+ "evidence_coverage": {
+  "vector": {
+   "A_policy": 1.0,
+   "B_model": 1.0,
+   "C_colloquial": 1.0,
+   "E_multi": 0.989,
+   "overall": 0.997
+  },
+  "bm25": {
+   "A_policy": 1.0,
+   "B_model": 1.0,
+   "C_colloquial": 0.883,
+   "E_multi": 0.947,
+   "overall": 0.958
+  },
+  "hybrid": {
+   "A_policy": 1.0,
+   "B_model": 1.0,
+   "C_colloquial": 0.983,
+   "E_multi": 0.992,
+   "overall": 0.994
+  },
+  "hybrid_rerank": {
+   "A_policy": 1.0,
+   "B_model": 1.0,
+   "C_colloquial": 1.0,
+   "E_multi": 0.975,
+   "overall": 0.994
+  }
+ },
+ "generation": {
+  "answer_coverage": {
+   "vector": {
+    "A_policy": 0.958,
+    "B_model": 0.994,
+    "C_colloquial": 0.983,
+    "E_multi": 0.892,
+    "overall": 0.957
+   },
+   "bm25": {
+    "A_policy": 0.95,
+    "B_model": 0.994,
+    "C_colloquial": 0.867,
+    "E_multi": 0.858,
+    "overall": 0.917
+   },
+   "hybrid": {
+    "A_policy": 0.958,
+    "B_model": 0.994,
+    "C_colloquial": 0.983,
+    "E_multi": 0.892,
+    "overall": 0.957
+   },
+   "hybrid_rerank": {
+    "A_policy": 0.967,
+    "B_model": 0.994,
+    "C_colloquial": 1.0,
+    "E_multi": 0.884,
+    "overall": 0.962
+   }
+  },
+  "faithfulness": {
+   "A_policy": {
+    "v": 1.0,
+    "answered": 60
+   },
+   "B_model": {
+    "v": 1.0,
+    "answered": 60
+   },
+   "C_colloquial": {
+    "v": 1.0,
+    "answered": 60
+   },
+   "E_multi": {
+    "v": 1.0,
+    "answered": 59
+   }
+  },
+  "faithfulness_cases": [],
+  "model_guard": {
+   "hits": 0,
+   "fixed": 0,
+   "cases": []
+  },
+  "refusal": {
+   "rate": 0.983,
+   "total": 60,
+   "correct": 59,
+   "cases": [
+    {
+     "id": "D3",
+     "query": "能不能把发票邮寄到我公司的另一个地址",
+     "section_path": "开票与配送 / 可开票类型",
+     "evidence": "可开票类型:个人账户默认开具电子普通发票,抬头填个人姓名或单位名称均可。\n电子专票仅企业账户可申请,提交时必须填写完整的纳税人识别号、开户行与对公账号,信息不全不予受理。\n纸质发票需在申请时备注邮寄地址,快递费到付,不接受面单改寄。\n一笔订单只开一次票,发票金额以实付金额为准,不含运费与积分抵扣部分。"
+    }
+   ],
+   "skipped_ids": []
+  },
+  "skipped": 1
+ },
+ "read_notes": {
+  "rag_recall": "你看纯 BM25 最容易漏跨文档类证据,只有 0.819,口语类也掉到 0.833,所以先查跨文档桶,优先上混合 + 重排,它的跨文档类能到 0.936。",
+  "rag_coverage": "盯跨文档类,纯向量 0.989,混合 + 重排 0.975,所以答题前先查跨文档证据有没有漏要点。",
+  "rag_answer_coverage": "纯 BM25 的口语类只有 0.867,混合 + 重排能到 1.0,所以先盯口语类跨策略差距,优先上混合 + 重排。"
+ }
+}
