@@ -21,7 +21,7 @@
 - 直接在 main 上开发提交(仓库历代章节惯例,无 feature 分支)。
 - 训练/推理产物不进 git:`.gitignore` 加 `data/topic/*` + `!data/topic/reports`;黄金样例落 `scripts/topic/golden_samples.jsonl` 进 git。
 - 类目表全系统唯一:任何脚本/服务/前端要类目一律 `from app.core.taxonomy import ...`,不许抄第二份。
-- 测试命令:`PYTHONPATH=. uv run pytest tests/... -v`(需本地 mysql,test 库 `mewhelp_core_test` 由 conftest 自建);LLM 相关脚本需上游可用(`.env` 里填好 `CHAT_*` 三项)。
+- 测试命令:`PYTHONPATH=. uv run pytest tests/... -v`(需本地 mysql,test 库 `rimlu_core_test` 由 conftest 自建);LLM 相关脚本需上游可用(`.env` 里填好 `CHAT_*` 三项)。
 
 ---
 
@@ -204,7 +204,7 @@ git commit -m "feat(topic): 权威类目表 taxonomy.py(17 类,设计文档 原�
 
 - [ ] **Step 1: 开发库应用 DDL**
 
-Run: `mysql -uroot -proot -h127.0.0.1 mewhelp < sql/10-topic-ddl.sql && mysql -uroot -proot -h127.0.0.1 mewhelp -e "SHOW CREATE TABLE topic_classifications\G" | head -5`
+Run: `mysql -uroot -proot -h127.0.0.1 rimlu < sql/10-topic-ddl.sql && mysql -uroot -proot -h127.0.0.1 rimlu -e "SHOW CREATE TABLE topic_classifications\G" | head -5`
 Expected: 表结构输出
 
 - [ ] **Step 2: conftest.py 注册 DDL 与清表顺序**
@@ -1392,7 +1392,7 @@ from app.core.taxonomy import TOPIC_NAMES
 
 DIR = pathlib.Path("data/topic/onnx")
 
-app = FastAPI(title="mewhelp topic topic classifier")
+app = FastAPI(title="rimlu topic topic classifier")
 _sess = ort.InferenceSession(str(DIR / "model.onnx"), providers=["CPUExecutionProvider"])
 _tok = Tokenizer.from_file(str(DIR / "tokenizer.json"))
 _tok.enable_truncation(max_length=128)
@@ -1486,7 +1486,7 @@ git commit -m "feat(topic): ONNX 推理服务 :8110(/classify 批量 + /healthz)
 """topic 旁路批处理:低置信度问题攒够一批,整批喂分类器归一次类,结果写 topic_classifications。
 实时对话主链路不调它。运行:make classify-pool(需 mysql + 分类器服务 :8110)。
 幂等:已归类的行(LEFT JOIN 命中)不重复归。定时跑 cron 示例:
-  0 3 * * * cd /path/to/mewhelp && make classify-pool >> log/classify-pool.log 2>&1"""
+  0 3 * * * cd /path/to/rimlu && make classify-pool >> log/classify-pool.log 2>&1"""
 import argparse
 import asyncio
 
@@ -1541,7 +1541,7 @@ classify-pool:  ## topic 旁路批量归类:攒够一批归一次,写 topic_clas
 Run:
 ```bash
 make classify-pool
-mysql -uroot -proot -h127.0.0.1 mewhelp -e "SELECT COUNT(*) FROM topic_classifications;"
+mysql -uroot -proot -h127.0.0.1 rimlu -e "SELECT COUNT(*) FROM topic_classifications;"
 make classify-pool   # 第二遍:应报「池里没有待归类问题」,行数不变
 ```
 Expected: 首遍写入约 70 条(全池);二遍幂等不重写

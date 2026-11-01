@@ -1,5 +1,5 @@
 """标注样例评估:核对 glm-5.2 是否按预期选中工具,并观察 query_faq 的关键词与漏召回。
-需服务运行中(docker compose/mewhelp-mysql + make seed + make dev)。"""
+需服务运行中(docker compose/rimlu-mysql + make seed + make dev)。"""
 import asyncio
 import json
 

@@ -867,7 +867,7 @@ git commit -m "feat(context): 验收配套——会话侧栏(列表/切换/历�
 
 - [ ] **Step 1: dev 库应用 DDL**
 
-Run: `mysql -h127.0.0.1 -uroot -proot mewhelp < sql/07-context-ddl.sql`(或 docker exec,视 docker-compose 环境)
+Run: `mysql -h127.0.0.1 -uroot -proot rimlu < sql/07-context-ddl.sql`(或 docker exec,视 docker-compose 环境)
 Verify: `SHOW COLUMNS FROM conversations` 含 summary / summary_upto_msg_id
 
 - [ ] **Step 2: 全量回归**

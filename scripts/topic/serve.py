@@ -15,7 +15,7 @@ from scripts.topic.inference_lib import apply_threshold
 
 DIR = pathlib.Path("data/topic/onnx")
 
-app = FastAPI(title="mewhelp topic topic classifier")
+app = FastAPI(title="rimlu topic topic classifier")
 _sess = ort.InferenceSession(str(DIR / "model.onnx"), providers=["CPUExecutionProvider"])
 _tok = Tokenizer.from_file(str(DIR / "tokenizer.json"))
 _tok.enable_truncation(max_length=128)

@@ -1350,7 +1350,7 @@ async def create_refund_action(req: CreateRefundRequest) -> CreateRefundResponse
 Run: `.venv/bin/pytest tests/test_refund_api.py -v`
 Expected: PASS。
 对真实库应用迁移(端到端验收前必须跑):
-Run: `docker exec -i mewhelp-mysql mysql --default-character-set=utf8mb4 -uroot -proot mewhelp < sql/06-dialog-ticket-type.sql`
+Run: `docker exec -i rimlu-mysql mysql --default-character-set=utf8mb4 -uroot -proot rimlu < sql/06-dialog-ticket-type.sql`
 
 - [ ] **Step 6: Commit**
 

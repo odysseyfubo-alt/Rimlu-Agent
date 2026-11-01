@@ -132,7 +132,7 @@ def summary_system(summary) -> SystemMessage | None   # main_agent 用
 
 ## 10. 测试与验证
 
-- **代码走 TDD**(测试库 `mewhelp_core_test` 惯例):
+- **代码走 TDD**(测试库 `rimlu_core_test` 惯例):
   - `build_window`:锚点命中/锚点缺失退化/token 兜底/摘要边界后无消息等分支;
   - 摘要边界计算(倒数第 K 轮前一条)、触发计数、防抖(含并发 gather 双触发只起一个、触发检查异常不外抛进回复路径);
   - repository 新函数(真库):摘要读写、计数、对话读取、会话列表;

@@ -22,7 +22,7 @@
 - `/api/chat` 升级为带工具链的 SSE 流式主入口(见 Task 12);`/api/extract`、`app/core/llm.py` **保持 chat 原样**。内存 `SessionStore` 与 `CUSTOMER_SERVICE_PROMPT` 弃用但**不删文件**(chat 不再引用)。
 - 前端聊天页改造走 **Vibe Coding**(不套 brainstorm/TDD/code review);验收在浏览器聊天页跑三条。
 - 涉及库 API 已在计划前用 Context7 核对(LangChain 1.3 / SQLAlchemy 2.0);实现中若遇 API 偏差以官方文档+实测为准。
-- 测试:可单测代码走 TDD(先红后绿);纯 Prompt/模型行为走标注样例评估。DB 测试连 Docker MySQL 的 `mewhelp_test` 库(不用 SQLite——ENUM/`ON UPDATE`/JSON 行为不一致)。
+- 测试:可单测代码走 TDD(先红后绿);纯 Prompt/模型行为走标注样例评估。DB 测试连 Docker MySQL 的 `rimlu_test` 库(不用 SQLite——ENUM/`ON UPDATE`/JSON 行为不一致)。
 
 ---
 
@@ -150,14 +150,14 @@ Expected:`pyproject.toml` 的 `dependencies` 新增两项,`uv.lock` 更新。若
 services:
   mysql:
     image: mysql:8.0
-    container_name: mewhelp-mysql
+    container_name: rimlu-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mewhelp
+      MYSQL_DATABASE: rimlu
     ports:
       - "3306:3306"
     volumes:
-      - mewhelp-mysql-data:/var/lib/mysql
+      - rimlu-mysql-data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d:ro   # 首启按文件名序执行 02-core-ddl.sql → 02-core-seed.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
@@ -166,7 +166,7 @@ services:
       retries: 20
 
 volumes:
-  mewhelp-mysql-data:
+  rimlu-mysql-data:
 ```
 
 - [ ] **Step 3: 起 MySQL 并确认建表**
@@ -175,7 +175,7 @@ Run:
 ```bash
 docker compose up -d
 docker compose exec -T mysql sh -c 'until mysqladmin ping -proot --silent; do sleep 1; done'
-docker compose exec -T mysql mysql -uroot -proot mewhelp -e "SHOW TABLES;"
+docker compose exec -T mysql mysql -uroot -proot rimlu -e "SHOW TABLES;"
 ```
 Expected:列出 `conversations`、`faq`、`messages`、`tickets` 四张表(initdb 自动跑了 02-core-ddl.sql)。
 
@@ -183,13 +183,13 @@ Expected:列出 `conversations`、`faq`、`messages`、`tickets` 四张表(initd
 
 `app/config.py` 在 `Settings` 内新增(其余不动):
 ```python
-    database_url: str = "mysql+asyncmy://root:root@localhost:3306/mewhelp"
-    test_database_url: str = "mysql+asyncmy://root:root@localhost:3306/mewhelp_test"
+    database_url: str = "mysql+asyncmy://root:root@localhost:3306/rimlu"
+    test_database_url: str = "mysql+asyncmy://root:root@localhost:3306/rimlu_test"
 ```
 `.env.example` 追加:
 ```
-DATABASE_URL=mysql+asyncmy://root:root@localhost:3306/mewhelp
-TEST_DATABASE_URL=mysql+asyncmy://root:root@localhost:3306/mewhelp_test
+DATABASE_URL=mysql+asyncmy://root:root@localhost:3306/rimlu
+TEST_DATABASE_URL=mysql+asyncmy://root:root@localhost:3306/rimlu_test
 ```
 
 - [ ] **Step 5: 写 db/base.py**
@@ -227,12 +227,12 @@ _TABLES = ["messages", "tickets", "conversations", "faq"]  # 删除顺序:先子
 
 @pytest_asyncio.fixture(scope="session")
 async def _test_engine():
-    # 用 server-url(不带库名)建 mewhelp_test 库
+    # 用 server-url(不带库名)建 rimlu_test 库
     server_url = settings.test_database_url.rsplit("/", 1)[0]
     admin = create_async_engine(server_url, isolation_level="AUTOCOMMIT")
     async with admin.connect() as conn:
-        await conn.execute(text("DROP DATABASE IF EXISTS mewhelp_test"))
-        await conn.execute(text("CREATE DATABASE mewhelp_test CHARACTER SET utf8mb4"))
+        await conn.execute(text("DROP DATABASE IF EXISTS rimlu_test"))
+        await conn.execute(text("CREATE DATABASE rimlu_test CHARACTER SET utf8mb4"))
     await admin.dispose()
 
     engine = create_async_engine(settings.test_database_url, pool_pre_ping=True)
@@ -613,7 +613,7 @@ WHERE NOT EXISTS (SELECT 1 FROM faq f WHERE f.question = seed.q);
 `Makefile` 追加(`.PHONY` 行补上 `seed`):
 ```makefile
 seed:
-	docker compose exec -T mysql mysql -uroot -proot mewhelp < sql/02-core-seed.sql
+	docker compose exec -T mysql mysql -uroot -proot rimlu < sql/02-core-seed.sql
 ```
 
 - [ ] **Step 3: 灌数并验证行数**
@@ -621,7 +621,7 @@ seed:
 Run:
 ```bash
 make seed
-docker compose exec -T mysql mysql -uroot -proot mewhelp -e "SELECT COUNT(*) FROM faq;"
+docker compose exec -T mysql mysql -uroot -proot rimlu -e "SELECT COUNT(*) FROM faq;"
 ```
 Expected: `6`。再跑一次 `make seed`,仍为 `6`(幂等)。
 
@@ -629,8 +629,8 @@ Expected: `6`。再跑一次 `make seed`,仍为 `6`(幂等)。
 
 Run:
 ```bash
-docker compose exec -T mysql mysql -uroot -proot mewhelp -e "SELECT question FROM faq WHERE question LIKE '%退货%';"
-docker compose exec -T mysql mysql -uroot -proot mewhelp -e "SELECT question FROM faq WHERE question LIKE '%鞋子%';"
+docker compose exec -T mysql mysql -uroot -proot rimlu -e "SELECT question FROM faq WHERE question LIKE '%退货%';"
+docker compose exec -T mysql mysql -uroot -proot rimlu -e "SELECT question FROM faq WHERE question LIKE '%鞋子%';"
 ```
 Expected:第一条返回「退货政策」;第二条**空**(漏召回,符合预期)。
 

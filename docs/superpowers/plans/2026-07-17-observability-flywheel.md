@@ -319,7 +319,7 @@ Run: `uv run pytest -v` → 零回归(注意既有 LCQ 相关测试不受 insert
 - [ ] **Step 7: 给 dev 库应用 DDL + Commit**
 
 ```bash
-docker exec -i mewhelp-mysql mysql --default-character-set=utf8mb4 -uroot -proot mewhelp < sql/09-observe-ddl.sql
+docker exec -i rimlu-mysql mysql --default-character-set=utf8mb4 -uroot -proot rimlu < sql/09-observe-ddl.sql
 git add app/db/models.py app/db/repository.py tests/conftest.py tests/db/test_observe_flywheel_tables.py
 git commit -m "feat(observe): 飞轮地基——review_queue/eval_runs ORM + 问题池快照/归并列 + repository 十方法"
 ```
@@ -525,15 +525,15 @@ curl -fsSL https://raw.githubusercontent.com/langfuse/langfuse/main/docker-compo
 1. 给 `langfuse-web` 服务的 environment 追加 headless 初始化变量,起来即有组织/项目/固定 key,免手工点界面:
 
 ```yaml
-      LANGFUSE_INIT_ORG_ID: mewhelp
-      LANGFUSE_INIT_ORG_NAME: MewHelp
-      LANGFUSE_INIT_PROJECT_ID: mewhelp-observe
-      LANGFUSE_INIT_PROJECT_NAME: mewhelp
-      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-mewhelp-local
-      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-mewhelp-local
-      LANGFUSE_INIT_USER_EMAIL: admin@mewhelp.local
+      LANGFUSE_INIT_ORG_ID: rimlu
+      LANGFUSE_INIT_ORG_NAME: Rimlu
+      LANGFUSE_INIT_PROJECT_ID: rimlu-observe
+      LANGFUSE_INIT_PROJECT_NAME: rimlu
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-rimlu-local
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-rimlu-local
+      LANGFUSE_INIT_USER_EMAIL: admin@rimlu.local
       LANGFUSE_INIT_USER_NAME: admin
-      LANGFUSE_INIT_USER_PASSWORD: mewhelp123
+      LANGFUSE_INIT_USER_PASSWORD: rimlu123
 ```
 
 2. 若与现有 mysql/milvus 栈端口冲突(3000/5432/6379/9000/9090),只改宿主侧映射,容器内不动;minio 与 milvus 的 minio 同名冲突时给服务/卷名加 `langfuse-` 前缀。
@@ -545,10 +545,10 @@ curl -fsSL https://raw.githubusercontent.com/langfuse/langfuse/main/docker-compo
 # observe: Langfuse 自部署观测栈(web:3000 + worker + postgres + clickhouse + redis + minio)
 langfuse-up:
 	docker compose -f docker-compose.langfuse.yml up -d
-	@echo "Langfuse 起中: http://localhost:3000 (admin@mewhelp.local / mewhelp123)"
+	@echo "Langfuse 起中: http://localhost:3000 (admin@rimlu.local / rimlu123)"
 	@echo "首次就绪约 2-3 分钟;key 已 headless 预置,写 .env:"
-	@echo "  LANGFUSE_PUBLIC_KEY=pk-lf-mewhelp-local"
-	@echo "  LANGFUSE_SECRET_KEY=sk-lf-mewhelp-local"
+	@echo "  LANGFUSE_PUBLIC_KEY=pk-lf-rimlu-local"
+	@echo "  LANGFUSE_SECRET_KEY=sk-lf-rimlu-local"
 	@echo "  LANGFUSE_BASE_URL=http://localhost:3000"
 
 langfuse-down:
@@ -1591,7 +1591,7 @@ Run: `uv run pytest tests/core/test_flywheel.py -v` → PASS;全量零回归。
 ```python
 """observe 飞轮批处理:扫问题池未归并条目 → 标准化+查重 → 待审队列。
 运行:make flywheel(需 mysql + 上游可用)。定时跑给 cron 示例:
-  */30 * * * * cd /path/to/mewhelp && make flywheel >> log/flywheel.log 2>&1
+  */30 * * * * cd /path/to/rimlu && make flywheel >> log/flywheel.log 2>&1
 """
 import asyncio
 import sys
@@ -2035,7 +2035,7 @@ git commit -m "feat(observe): 审核 API——通过即写回知识库(dualwrite
 """observe 自动化评估流水线:复用 rag 评估集与指标,定期跑、落 eval_runs、连趋势。
 指标:检索段 Recall@10 / MRR(hybrid_rerank,可答桶),生成段 Faithfulness + D 桶拒答率。
 运行:make eval-flywheel(TRIGGER=手动|定时,默认手动)。cron 示例:
-  0 6 * * * cd /path/to/mewhelp && make eval-flywheel TRIGGER=定时 >> log/eval.log 2>&1
+  0 6 * * * cd /path/to/rimlu && make eval-flywheel TRIGGER=定时 >> log/eval.log 2>&1
 趋势:读最近 10 轮,对比上一轮涨跌;任何指标下滑标 ⚠——README:「重点全在这条趋势线上」。
 产物:dev-notes/observe-eval-trend.txt
 """

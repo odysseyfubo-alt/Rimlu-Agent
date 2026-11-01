@@ -14,7 +14,7 @@
 - 库 API 动手前先 Context7 核对(工作要求 3)。已核关键结论:新版 SDK 高层类为 `MCPServer`(`mcp.server`,FastMCP 已更名,transport 参数移到 `run()`);adapters 的 transport 键为 `"streamable_http"`;MCP 工具 `args_schema` 即 JSON Schema dict;`MultiServerMCPClient(handle_tool_errors=False)` 让工具错误抛 `ToolException` 由引擎统一分诊;get_tools/工具调用每次新 session(现问现拿天然成立)。**实装版本若与此不符,以实装为准并在 dev-notes 记录。**
 - JSON 序列化一律 `ensure_ascii=False`;审计写失败不许反拦工具执行;写操作(create_ticket)恒不自动重试。
 - 每任务完成即 commit + 追记 `dev-notes/toolkit.md`(不许收尾补记);
-- 测试命令:`uv run pytest <path> -v`;全量 `make test`。测试连真 MySQL 测试库(docker mewhelp-mysql 需在跑)。
+- 测试命令:`uv run pytest <path> -v`;全量 `make test`。测试连真 MySQL 测试库(docker rimlu-mysql 需在跑)。
 - graph 投诉按钮建单路径(`complaint_reply` 节点 + `POST /api/actions/create-ticket`)一行不动。
 - 前端(Task 7)走 Vibe Coding,不套 TDD;prompt 改动用标注样例跑验证(Task 8),不硬凑单测。
 
@@ -180,7 +180,7 @@ async def insert_tool_audit(
 - [ ] **Step 6: 跑测试确认过 + dev 库应用 DDL**
 
 Run: `uv run pytest tests/db/test_tool_audit.py -v` → PASS
-Run: `docker exec -i mewhelp-mysql mysql --default-character-set=utf8mb4 -uroot -proot mewhelp < sql/08-toolkit-ddl.sql && docker exec -i mewhelp-mysql mysql -uroot -proot mewhelp -e "DESC tool_audit_logs;"`
+Run: `docker exec -i rimlu-mysql mysql --default-character-set=utf8mb4 -uroot -proot rimlu < sql/08-toolkit-ddl.sql && docker exec -i rimlu-mysql mysql -uroot -proot rimlu -e "DESC tool_audit_logs;"`
 Expected: 表结构 13 列。
 
 - [ ] **Step 7: Commit**
@@ -1217,7 +1217,7 @@ asyncio.run(main())
 EOF
 make mcp-down
 ```
-Expected: 清单含内置 4 + MCP 3;调用成功且 content 是翻译后的中文字段。(此冒烟会向 mewhelp 库落审计——dev 库已建表,正好人肉 SELECT 验一条。)
+Expected: 清单含内置 4 + MCP 3;调用成功且 content 是翻译后的中文字段。(此冒烟会向 rimlu 库落审计——dev 库已建表,正好人肉 SELECT 验一条。)
 
 - [ ] **Step 6: Commit**
 

@@ -25,8 +25,8 @@ class Settings(BaseSettings):
     chat_reasoning_split: str = ""    # MiniMax 专属:true 让思考进 reasoning_content 独立字段,
                                       # 而不是混在 content 里的 <think>。关不掉思考链时靠它兜底
     token_budget: int = 2000
-    database_url: str = "mysql+asyncmy://root:root@localhost:3307/mewhelp"
-    test_database_url: str = "mysql+asyncmy://root:root@localhost:3307/mewhelp_core_test"
+    database_url: str = "mysql+asyncmy://root:root@localhost:3307/rimlu"
+    test_database_url: str = "mysql+asyncmy://root:root@localhost:3307/rimlu_core_test"
     # kb 知识库检索
     embed_model: str = "BAAI/bge-m3"          # 上游真实名(无网关别名可用)
     milvus_uri: str = "http://localhost:19530"   # rag: Lite → Standalone

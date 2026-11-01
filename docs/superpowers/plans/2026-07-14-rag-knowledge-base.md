@@ -1973,7 +1973,7 @@ Edit `Makefile`,追加:
 
 ```makefile
 seed-conv:
-	docker exec -i mewhelp-mysql mysql --default-character-set=utf8mb4 -uroot -proot mewhelp < sql/03-kb-seed.sql
+	docker exec -i rimlu-mysql mysql --default-character-set=utf8mb4 -uroot -proot rimlu < sql/03-kb-seed.sql
 
 eval-mining:
 	PYTHONPATH=. uv run python scripts/eval_mining.py
@@ -2092,7 +2092,7 @@ git add -A && git commit -m "feat(kb): 知识库录入页 + 后台管理聚合�
 
 - [ ] **Step 1: 起服务 + 在页面上建库**
 
-`make dev`(应用;MySQL 复用 mewhelp-mysql),开 `/kb`:
+`make dev`(应用;MySQL 复用 rimlu-mysql),开 `/kb`:
 1. ② 建库材料按「重跑 材料清单与切块预览」→ 日志窗口里看到各文件块数与「表格按行拆已触发」;页面表格里的块数与日志里的总块数对得上。
 2. 按「重跑 离线建库」→ chunks 落 pending;顶部闸条 `待向量化` 有数。
 3. ④ 区按「向量化待补块」→ pending 归零、`done` 与 `Milvus 条数` 相等、`双写` 显示「一致」。

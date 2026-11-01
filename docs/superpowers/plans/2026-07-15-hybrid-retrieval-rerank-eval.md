@@ -74,14 +74,14 @@
 ```yaml
   etcd:
     image: quay.io/coreos/etcd:v3.5.16
-    container_name: mewhelp-milvus-etcd
+    container_name: rimlu-milvus-etcd
     environment:
       - ETCD_AUTO_COMPACTION_MODE=revision
       - ETCD_AUTO_COMPACTION_RETENTION=1000
       - ETCD_QUOTA_BACKEND_BYTES=4294967296
       - ETCD_SNAPSHOT_COUNT=50000
     volumes:
-      - mewhelp-milvus-etcd:/etcd
+      - rimlu-milvus-etcd:/etcd
     command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
     healthcheck:
       test: ["CMD", "etcdctl", "endpoint", "health"]
@@ -91,12 +91,12 @@
 
   minio:
     image: minio/minio:RELEASE.2024-05-28T17-19-04Z
-    container_name: mewhelp-milvus-minio
+    container_name: rimlu-milvus-minio
     environment:
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
     volumes:
-      - mewhelp-milvus-minio:/minio_data
+      - rimlu-milvus-minio:/minio_data
     command: minio server /minio_data --console-address ":9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -106,13 +106,13 @@
 
   milvus-standalone:
     image: milvusdb/milvus:v2.5.4
-    container_name: mewhelp-milvus
+    container_name: rimlu-milvus
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: etcd:2379
       MINIO_ADDRESS: minio:9000
     volumes:
-      - mewhelp-milvus-data:/var/lib/milvus
+      - rimlu-milvus-data:/var/lib/milvus
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
       interval: 30s
@@ -129,9 +129,9 @@
 
 底部 volumes 追加:
 ```yaml
-  mewhelp-milvus-etcd:
-  mewhelp-milvus-minio:
-  mewhelp-milvus-data:
+  rimlu-milvus-etcd:
+  rimlu-milvus-minio:
+  rimlu-milvus-data:
 ```
 
 - [ ] **Step 2: Makefile 加 milvus 起停 + 起服务**
@@ -1522,7 +1522,7 @@ git commit -m "feat(rag): 四策略评估脚本——检索、证据覆盖度、
 `Makefile` 的 `kb-reset` 里 Milvus 清理从「删 Lite 文件」改为「drop 集合」:
 ```makefile
 kb-reset:
-	docker exec -i mewhelp-mysql mysql -uroot -proot mewhelp -e "SET FOREIGN_KEY_CHECKS=0; DELETE FROM knowledge_chunks; DELETE FROM qa_extraction_staging; SET FOREIGN_KEY_CHECKS=1;"
+	docker exec -i rimlu-mysql mysql -uroot -proot rimlu -e "SET FOREIGN_KEY_CHECKS=0; DELETE FROM knowledge_chunks; DELETE FROM qa_extraction_staging; SET FOREIGN_KEY_CHECKS=1;"
 	PYTHONPATH=. uv run python -c "from app.kb import milvus_client as m; c=m.get_client(); m.drop(c,'knowledge')"
 	@echo "KB 已重置。重跑: make kb-build && make kb-vectorize"
 ```
@@ -1657,7 +1657,7 @@ make dev   # :8000 应用(app 与建库可并存,Standalone 无锁)
 - **验收3**(引用可点):问「邮费是多少」→ 答案带引用角标 → 点击看到来源 section_path + 原文。截图 `dev-notes/rag-acceptance3.png`。
 - **验收4**(拒答+落池):问「你们卖火星车吗」→ 明确拒答 → 查库:
 ```bash
-docker exec -i mewhelp-mysql mysql -uroot -proot mewhelp -e "SELECT id,source,LEFT(raw_question,20),LEFT(reason,30) FROM low_confidence_questions ORDER BY id DESC LIMIT 5;"
+docker exec -i rimlu-mysql mysql -uroot -proot rimlu -e "SELECT id,source,LEFT(raw_question,20),LEFT(reason,30) FROM low_confidence_questions ORDER BY id DESC LIMIT 5;"
 ```
 Expected: 有新记录,source ∈ {retrieval_low_conf, self_check}。截图 `dev-notes/rag-acceptance4.png`。
 - **验收5**(满意度反馈):任一回答左下角有 👍/👎 → 点击其一 → 点亮所选 + 显示「已反馈」+ 两键锁定。截图 `dev-notes/rag-acceptance5.png`。

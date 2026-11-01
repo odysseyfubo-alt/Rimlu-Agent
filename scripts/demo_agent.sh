@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# core 验收演示:三条验收标准。需 mewhelp-mysql 容器 + make seed + make dev 就绪。
+# core 验收演示:三条验收标准。需 rimlu-mysql 容器 + make seed + make dev 就绪。
 set -euo pipefail
 BASE=http://localhost:8000
 
